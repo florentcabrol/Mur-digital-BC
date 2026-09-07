@@ -1,0 +1,6 @@
+{
+  "name": "Bleu Citron",
+  "description": "Partagez votre meilleur souvenir de concert ou spectacle avec Bleu Citron.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
