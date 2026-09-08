@@ -70,13 +70,13 @@ export const WallHeader: React.FC<WallHeaderProps> = ({
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Livre d'or en direct</span>
+                <span>Souvenirs en direct</span>
               </span>
               <span className="text-[10px] text-slate-400 hidden sm:inline">• 40 ans de concerts & spectacles</span>
             </div>
 
             <p className="text-xs sm:text-sm font-medium text-slate-300 leading-snug">
-              {config.subtitle || 'Partager votre meilleur souvenir de concert / spectacle avec Bleu Citron'}
+              {config.subtitle || 'Partage ton meilleur souvenir de concert / spectacle avec Bleu Citron'}
             </p>
           </div>
         </div>

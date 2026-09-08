@@ -12,7 +12,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'wall' | 'submit' | 'admin'>('wall');
   const [config, setConfig] = useState<WallConfig>({
     title: 'Bleu Citron',
-    subtitle: 'Partager votre meilleur souvenir de concert / spectacle avec Bleu Citron',
+    subtitle: 'Partage ton meilleur souvenir de concert / spectacle avec Bleu Citron',
     campaignCity: 'Bleu Citron',
     theme: 'bleu-nuit',
     allowAnonymous: true,

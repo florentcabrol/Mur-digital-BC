@@ -69,7 +69,7 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose, wallT
           <div className="flex flex-col items-center justify-center gap-1.5 mb-3">
             <BleuCitronLogo className="h-8 w-auto" light={true} />
             <span className="text-[10px] text-yellow-400 font-semibold tracking-wider uppercase">
-              Partagez votre souvenir
+              Partage ton souvenir
             </span>
           </div>
 
@@ -77,7 +77,7 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose, wallT
             Affiche & QR Code
           </h2>
           <p className="text-slate-400 text-xs mt-1 max-w-xs mx-auto">
-            Scannez pour écrire et projeter votre souvenir en direct
+            Scanne pour écrire et projeter ton souvenir en direct
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose, wallT
           {/* Instructions */}
           <div className="text-center space-y-1 mb-5">
             <p className="text-xs font-semibold text-white">
-              Scannez pour écrire en direct
+              Scanne pour écrire en direct
             </p>
             <p className="text-[11px] text-slate-400">
               Chaque participant partage son souvenir librement

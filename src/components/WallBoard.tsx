@@ -99,9 +99,9 @@ export const WallBoard: React.FC<WallBoardProps> = ({
               <Sparkles className="w-6 h-6" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold font-display tracking-tight">Le Mur attend vos souvenirs</h3>
+              <h3 className="text-xl font-bold font-display tracking-tight">Le Mur attend tes souvenirs</h3>
               <p className="text-xs text-slate-400 leading-relaxed max-w-xs mx-auto">
-                Scannez le QR Code pour écrire votre premier souvenir de concert avec Bleu Citron.
+                Scanne le QR Code pour écrire ton premier souvenir de concert avec Bleu Citron.
               </p>
             </div>
             <button
@@ -154,7 +154,7 @@ export const WallBoard: React.FC<WallBoardProps> = ({
               Bleu Citron
             </span>
             <p className="text-xs font-bold text-white leading-tight font-display">
-              Scannez l'affiche
+              Scanne l'affiche
             </p>
             <p className="text-[10px] text-slate-400 font-medium">
               pour écrire en direct

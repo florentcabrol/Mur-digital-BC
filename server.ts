@@ -6,19 +6,32 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { WallMessage, WallConfig, AiModerationResult } from "./src/types";
 
 const PORT = 3000;
-const DATA_DIR = path.join(process.cwd(), "data");
-const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
-const CONFIG_FILE = path.join(DATA_DIR, "config.json");
+let DATA_DIR = path.join(process.cwd(), "data");
+let MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+let CONFIG_FILE = path.join(DATA_DIR, "config.json");
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Ensure data directory exists safely with fallback to /tmp
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch {
+  try {
+    DATA_DIR = path.join("/tmp", "bleucitron_data");
+    MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+    CONFIG_FILE = path.join(DATA_DIR, "config.json");
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+  } catch (errFallback) {
+    console.warn("Disk data directory unavailable, operating in in-memory mode:", errFallback);
+  }
 }
 
 // Initial default configuration for Bleu Citron Productions
 const DEFAULT_CONFIG: WallConfig = {
   title: "Bleu Citron",
-  subtitle: "Partager votre meilleur souvenir de concert / spectacle avec Bleu Citron",
+  subtitle: "Partage ton meilleur souvenir de concert / spectacle avec Bleu Citron",
   theme: "bleu-nuit",
   allowAnonymous: true,
   maxChars: 400,

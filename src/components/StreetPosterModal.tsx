@@ -110,10 +110,10 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
             {/* Campaign Main Title */}
             <div className="relative z-10 space-y-1.5 mb-6">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white uppercase font-display leading-tight">
-                Votre Meilleur Souvenir
+                Ton Meilleur Souvenir
               </h1>
               <p className="text-xs text-slate-300 max-w-xs mx-auto">
-                Partagez en direct votre souvenir de concert ou de spectacle
+                Partage en direct ton souvenir de concert ou de spectacle
               </p>
             </div>
 
@@ -132,22 +132,22 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
               )}
               <div className="mt-2 text-[10px] font-bold text-slate-900 flex items-center justify-center gap-1.5 tracking-wide uppercase">
                 <Smartphone className="w-3.5 h-3.5 text-slate-950" />
-                <span>Scannez avec votre téléphone</span>
+                <span>Scanne avec ton téléphone</span>
               </div>
             </div>
 
             {/* Instructions */}
             <div className="relative z-10 w-full grid grid-cols-3 gap-2 text-center pt-2 pb-3 border-t border-white/10 text-[10px]">
               <div className="p-2 rounded-xl bg-white/[0.03]">
-                <div className="font-bold text-yellow-400">1. SCANNEZ</div>
+                <div className="font-bold text-yellow-400">1. SCANNE</div>
                 <div className="text-slate-400 text-[9px] mt-0.5">Le QR Code</div>
               </div>
               <div className="p-2 rounded-xl bg-white/[0.03]">
-                <div className="font-bold text-white">2. ÉCRIVEZ</div>
-                <div className="text-slate-400 text-[9px] mt-0.5">Votre souvenir</div>
+                <div className="font-bold text-white">2. ÉCRIS</div>
+                <div className="text-slate-400 text-[9px] mt-0.5">Ton souvenir</div>
               </div>
               <div className="p-2 rounded-xl bg-white/[0.03]">
-                <div className="font-bold text-yellow-400">3. PARTAGEZ</div>
+                <div className="font-bold text-yellow-400">3. PARTAGE</div>
                 <div className="text-slate-400 text-[9px] mt-0.5">En direct</div>
               </div>
             </div>

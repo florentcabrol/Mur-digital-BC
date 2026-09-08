@@ -136,7 +136,7 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) {
-      setError('Veuillez partager votre souvenir avant de valider.');
+      setError('Écris ton souvenir avant de valider.');
       return;
     }
 
@@ -174,7 +174,7 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
         });
       }
     } catch (err: any) {
-      setError(err.message || 'Impossible d\'enregistrer votre souvenir pour le moment.');
+      setError(err.message || 'Impossible d\'enregistrer ton souvenir pour le moment.');
     } finally {
       setSubmitting(false);
     }
@@ -226,17 +226,17 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
         {/* Hero Card: Épuré, Moderne & Élégant */}
         <div className="relative rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/[0.08] p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400">
-              Livre d'or
+            <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400">
+              Bleu Citron
             </span>
             <span className="text-slate-600">•</span>
             <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
-              Bleu Citron
+              Concerts & Spectacles
             </span>
           </div>
 
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug font-display">
-            Partager votre meilleur souvenir de concert / spectacle avec Bleu Citron
+            Partage ton meilleur souvenir de concert / spectacle avec Bleu Citron
           </h1>
         </div>
 
@@ -258,11 +258,11 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
                 </div>
               )}
 
-              {/* Champ Libre: Votre Souvenir */}
+              {/* Champ Libre: Ton Souvenir */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs">
                   <label htmlFor="memory-text-input" className="font-semibold text-slate-200 tracking-wide">
-                    Votre souvenir
+                    Ton souvenir
                   </label>
                   <span className={`text-[11px] font-mono ${
                     text.length > (config.maxChars || 400) - 20 ? 'text-yellow-400' : 'text-slate-500'
@@ -278,7 +278,7 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
                     maxLength={config.maxChars || 400}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder="Racontez librement votre moment inoubliable : un concert marquant, un artiste, une émotion, une tournée..."
+                    placeholder="Raconte librement ton moment inoubliable : un concert marquant, un artiste, une émotion, une tournée..."
                     className="w-full bg-[#050812] border border-white/10 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 rounded-2xl p-4 text-sm sm:text-base text-white placeholder-slate-500 transition-all resize-none leading-relaxed outline-hidden"
                   />
                 </div>
@@ -342,7 +342,7 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
                   maxLength={40}
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
-                  placeholder="Votre prénom, pseudo (laisser vide pour Anonyme)"
+                  placeholder="Ton prénom, pseudo (laisser vide pour Anonyme)"
                   className="w-full bg-[#050812] border border-white/10 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 transition-all outline-hidden"
                 />
               </div>
@@ -399,7 +399,7 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
 
                   {/* Souvenir text displayed in chosen font */}
                   <p className={`text-lg font-medium text-white tracking-tight leading-relaxed break-words whitespace-pre-wrap ${activeFontClass}`}>
-                    "{text.trim() || 'Votre souvenir s\'affichera ici avec la police choisie...'}"
+                    "{text.trim() || 'Ton souvenir s\'affichera ici avec la police choisie...'}"
                   </p>
 
                   <div className="mt-5 pt-3 border-t border-white/[0.06] flex justify-between items-center text-xs">
@@ -447,11 +447,11 @@ export const SubmitForm: React.FC<SubmitFormProps> = ({ config, onBackToWall }) 
                 </div>
 
                 <h2 className="text-xl font-bold text-white tracking-tight font-display">
-                  Merci pour votre partage
+                  Merci pour ton partage
                 </h2>
 
                 <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
-                  Votre souvenir a bien été transmis à l'équipe de Bleu Citron.
+                  Ton souvenir a bien été transmis à l'équipe de Bleu Citron.
                 </p>
               </div>
 
