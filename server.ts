@@ -3,12 +3,13 @@ import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
-import { WallMessage, WallConfig, AiModerationResult } from "./src/types";
+import { WallMessage, WallConfig, AiModerationResult, ParticipantRecord, CrmStats } from "./src/types";
 
 const PORT = 3000;
 let DATA_DIR = path.join(process.cwd(), "data");
 let MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 let CONFIG_FILE = path.join(DATA_DIR, "config.json");
+let PARTICIPANTS_FILE = path.join(DATA_DIR, "participants.json");
 
 // Ensure data directory exists safely with fallback to /tmp
 try {
@@ -20,6 +21,7 @@ try {
     DATA_DIR = path.join("/tmp", "bleucitron_data");
     MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
     CONFIG_FILE = path.join(DATA_DIR, "config.json");
+    PARTICIPANTS_FILE = path.join(DATA_DIR, "participants.json");
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
@@ -31,13 +33,14 @@ try {
 // Initial default configuration for Bleu Citron Productions
 const DEFAULT_CONFIG: WallConfig = {
   title: "Bleu Citron",
-  subtitle: "Partage ton meilleur souvenir de concert / spectacle avec Bleu Citron",
-  theme: "bleu-nuit",
+  subtitle: "Raconte-nous ton plus beau souvenir de concert et tente de gagner 1 an de spectacles Bleu Citron",
+  theme: "bleu-citron",
   allowAnonymous: true,
   maxChars: 400,
   autoApproveSafe: false, // Default: require admin human validation as requested
   campaignCity: "Bleu Citron",
   brandName: "Bleu Citron Productions",
+  crmAutoSync: false,
 };
 
 // Initial default messages with Bleu Citron concert & show memories
@@ -46,6 +49,8 @@ const INITIAL_MESSAGES: WallMessage[] = [
     id: "msg_init_1",
     text: "Le concert de Bigflo & Oli au Stadium... Une communion totale avec 30 000 personnes et une émotion inoubliable du début à la fin !",
     author: "Sophie M.",
+    email: "sophie.martinez@gmail.com",
+    optInConsent: true,
     color: "yellow",
     createdAt: Date.now() - 3600000,
     status: "approved",
@@ -65,6 +70,8 @@ const INITIAL_MESSAGES: WallMessage[] = [
     id: "msg_init_2",
     text: "Le spectacle d'Alex Lutz au Casino Barrière, des rires aux larmes pendant deux heures. La magie du spectacle vivant signée Bleu Citron.",
     author: "Camille & Thomas",
+    email: "camille.thomas31@wanadoo.fr",
+    optInConsent: true,
     color: "blue",
     createdAt: Date.now() - 1800000,
     status: "approved",
@@ -84,6 +91,8 @@ const INITIAL_MESSAGES: WallMessage[] = [
     id: "msg_init_3",
     text: "Grand Corps Malade au Zénith : les frissons sur chaque texte. Un souvenir gravé à jamais dans ma mémoire !",
     author: "Julien",
+    email: "julien.toulouse@outlook.fr",
+    optInConsent: false,
     color: "green",
     createdAt: Date.now() - 900000,
     status: "approved",
@@ -104,6 +113,7 @@ const INITIAL_MESSAGES: WallMessage[] = [
 // In-memory data structures
 let wallConfig: WallConfig = loadConfig();
 let messages: WallMessage[] = loadMessages();
+let participants: ParticipantRecord[] = loadParticipants();
 
 function loadConfig(): WallConfig {
   try {
@@ -142,6 +152,173 @@ function saveMessages(): void {
     fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2), "utf-8");
   } catch (err) {
     console.error("Error saving messages:", err);
+  }
+}
+
+function loadParticipants(): ParticipantRecord[] {
+  try {
+    if (fs.existsSync(PARTICIPANTS_FILE)) {
+      const data = fs.readFileSync(PARTICIPANTS_FILE, "utf-8");
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error("Error loading participants:", err);
+  }
+  // Initialize and synchronize from messages
+  const initialList = buildParticipantsFromMessages(messages);
+  saveParticipantsList(initialList);
+  return initialList;
+}
+
+function saveParticipants(): void {
+  saveParticipantsList(participants);
+}
+
+function saveParticipantsList(list: ParticipantRecord[]): void {
+  try {
+    fs.writeFileSync(PARTICIPANTS_FILE, JSON.stringify(list, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Error saving participants:", err);
+  }
+}
+
+function buildParticipantsFromMessages(msgs: WallMessage[]): ParticipantRecord[] {
+  const map = new Map<string, ParticipantRecord>();
+  msgs.forEach((m) => {
+    if (m.email && typeof m.email === "string" && m.email.trim().length > 0) {
+      const normEmail = m.email.trim().toLowerCase();
+      const existing = map.get(normEmail);
+      if (existing) {
+        existing.totalSubmissions += 1;
+        if (m.createdAt > existing.lastSubmissionAt) {
+          existing.lastSubmissionAt = m.createdAt;
+          existing.latestMemoryText = m.text;
+        }
+        if (m.optInConsent) {
+          existing.optInConsent = true;
+          existing.rgpdStatus = "opt_in";
+        }
+        if (!existing.allMemoryIds.includes(m.id)) {
+          existing.allMemoryIds.push(m.id);
+        }
+      } else {
+        const cleanOptIn = Boolean(m.optInConsent);
+        map.set(normEmail, {
+          id: `part_${normEmail.replace(/[^a-z0-9]/g, "_")}`,
+          email: normEmail,
+          firstName: m.author && m.author !== "Anonyme" ? m.author : "Participant",
+          fullName: m.author && m.author !== "Anonyme" ? m.author : "Participant",
+          optInConsent: cleanOptIn,
+          rgpdStatus: cleanOptIn ? "opt_in" : "opt_out",
+          createdAt: m.createdAt,
+          lastSubmissionAt: m.createdAt,
+          totalSubmissions: 1,
+          latestMemoryText: m.text,
+          allMemoryIds: [m.id],
+          source: "Mur 40 ans - Concours 1 an de spectacles",
+        });
+      }
+    }
+  });
+  return Array.from(map.values()).sort((a, b) => b.lastSubmissionAt - a.lastSubmissionAt);
+}
+
+function registerOrUpdateParticipant(data: {
+  email: string;
+  author: string;
+  optInConsent: boolean;
+  memoryId: string;
+  memoryText: string;
+}): ParticipantRecord {
+  const normEmail = data.email.trim().toLowerCase();
+  const existingIndex = participants.findIndex((p) => p.email === normEmail);
+  const now = Date.now();
+
+  let pRecord: ParticipantRecord;
+
+  if (existingIndex >= 0) {
+    pRecord = participants[existingIndex];
+    pRecord.totalSubmissions += 1;
+    pRecord.lastSubmissionAt = now;
+    pRecord.latestMemoryText = data.memoryText;
+    if (data.author && data.author !== "Anonyme") {
+      pRecord.firstName = data.author;
+      pRecord.fullName = data.author;
+    }
+    // Si la personne a validé l'opt-in lors de cette participation, le consentement devient actif
+    if (data.optInConsent) {
+      pRecord.optInConsent = true;
+      pRecord.rgpdStatus = "opt_in";
+    }
+    if (!pRecord.allMemoryIds.includes(data.memoryId)) {
+      pRecord.allMemoryIds.push(data.memoryId);
+    }
+    // Remonter en tête de liste
+    participants.splice(existingIndex, 1);
+    participants.unshift(pRecord);
+  } else {
+    pRecord = {
+      id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      email: normEmail,
+      firstName: data.author && data.author !== "Anonyme" ? data.author : "Participant",
+      fullName: data.author && data.author !== "Anonyme" ? data.author : "Participant",
+      optInConsent: Boolean(data.optInConsent),
+      rgpdStatus: data.optInConsent ? "opt_in" : "opt_out",
+      createdAt: now,
+      lastSubmissionAt: now,
+      totalSubmissions: 1,
+      latestMemoryText: data.memoryText,
+      allMemoryIds: [data.memoryId],
+      source: "Mur 40 ans - Concours 1 an de spectacles",
+    };
+    participants.unshift(pRecord);
+  }
+
+  saveParticipants();
+  broadcastEvent("participant_updated", pRecord);
+
+  // Déclencher le webhook CRM si configuré
+  triggerCrmWebhook(pRecord);
+
+  return pRecord;
+}
+
+async function triggerCrmWebhook(p: ParticipantRecord): Promise<void> {
+  if (!wallConfig.crmWebhookUrl || !wallConfig.crmAutoSync) return;
+  try {
+    const payload = {
+      event: "participant_submitted",
+      email: p.email,
+      firstName: p.firstName,
+      fullName: p.fullName,
+      optIn: p.optInConsent,
+      rgpdStatus: p.rgpdStatus,
+      submittedAt: new Date(p.lastSubmissionAt).toISOString(),
+      memory: p.latestMemoryText,
+      source: p.source,
+      campaign: "Bleu Citron - 1 An de spectacles",
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    await fetch(wallConfig.crmWebhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "BleuCitron-CRM-Integration/1.0",
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    p.crmExportedAt = Date.now();
+    saveParticipants();
+  } catch (err) {
+    console.warn("CRM Webhook sync warning:", err);
   }
 }
 
@@ -309,7 +486,7 @@ function heuristicModeration(text: string, _author: string): AiModerationResult 
 async function startServer() {
   const app = express();
 
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
 
   // SSE Stream for real-time live synchronization
   app.get("/api/events", (req, res) => {
@@ -333,6 +510,69 @@ async function startServer() {
   // Health check
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: Date.now() });
+  });
+
+  // Check availability of official campaign visual assets
+  app.get("/api/check-assets", (_req, res) => {
+    const targetDir = path.join(process.cwd(), "public", "images");
+    const requiredFiles = [
+      "BANNIERE-CONCOURS_CRUSH-A.png",
+      "BANNIERE-CONCOURS_LARMES-A.png",
+      "BANNIERE-CONCOURS_PARENTS-A.png",
+      "BANNIERE-CONCOURS_PETITESOEUR-A.png",
+      "BANNIERE-CONCOURS_POTES-A.png",
+      "PASTILLE 1 AN DE SPECTACLES.png",
+    ];
+    const status: Record<string, boolean> = {};
+    requiredFiles.forEach((f) => {
+      status[f] = fs.existsSync(path.join(targetDir, f));
+    });
+    res.json({ targetDir, status });
+  });
+
+  // Direct upload endpoint for official PNG campaign assets
+  app.post("/api/upload-asset", (req, res) => {
+    try {
+      const { filename, base64Data } = req.body;
+      if (!filename || !base64Data) {
+        res.status(400).json({ error: "filename and base64Data required" });
+        return;
+      }
+      const safeName = path.basename(filename);
+      const targetDir = path.join(process.cwd(), "public", "images");
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
+      // Strip data URL prefix if present (e.g. data:image/png;base64,...)
+      const cleanedBase64 = base64Data.replace(/^data:image\/[a-z0-9+-]+;base64,/, "");
+      const buffer = Buffer.from(cleanedBase64, "base64");
+      const filePath = path.join(targetDir, safeName);
+      fs.writeFileSync(filePath, buffer);
+
+      // Also copy to dist/images if dist directory exists
+      const distDir = path.join(process.cwd(), "dist", "images");
+      if (fs.existsSync(distDir)) {
+        fs.writeFileSync(path.join(distDir, safeName), buffer);
+      }
+
+      // If it's the pastille, also create standard symlinks/copies
+      if (safeName === "PASTILLE 1 AN DE SPECTACLES.png") {
+        fs.writeFileSync(path.join(targetDir, "pastille-1-an-de-spectacles.png"), buffer);
+        fs.writeFileSync(path.join(targetDir, "pastille.png"), buffer);
+        if (fs.existsSync(distDir)) {
+          fs.writeFileSync(path.join(distDir, "pastille-1-an-de-spectacles.png"), buffer);
+          fs.writeFileSync(path.join(distDir, "pastille.png"), buffer);
+        }
+      }
+
+      console.log(`Successfully uploaded ${safeName} (${buffer.length} bytes)`);
+      broadcastEvent("asset_updated", { filename: safeName, timestamp: Date.now() });
+      res.json({ success: true, filename: safeName, size: buffer.length });
+    } catch (err: any) {
+      console.error("Asset upload error:", err);
+      res.status(500).json({ error: err.message || "Failed to save asset" });
+    }
   });
 
   // Get Wall Configuration
@@ -404,7 +644,7 @@ async function startServer() {
   // Submit a new message from QR code mobile interface
   app.post("/api/messages", async (req, res) => {
     try {
-      const { text, author, color, fontFamily } = req.body;
+      const { text, author, color, fontFamily, email, optInConsent } = req.body;
 
       if (!text || typeof text !== "string" || text.trim().length === 0) {
         res.status(400).json({ error: "Le texte du message est obligatoire." });
@@ -415,6 +655,8 @@ async function startServer() {
       const cleanAuthor = (author && typeof author === "string" && author.trim())
         ? author.trim().slice(0, 40)
         : (wallConfig.allowAnonymous ? "Anonyme" : "Participant");
+      const cleanEmail = (email && typeof email === "string") ? email.trim().slice(0, 100) : undefined;
+      const cleanOptIn = Boolean(optInConsent);
 
       const validColors: WallMessage["color"][] = ["yellow", "pink", "blue", "green", "purple", "orange", "white"];
       const noteColor: WallMessage["color"] = validColors.includes(color) ? color : "yellow";
@@ -428,9 +670,19 @@ async function startServer() {
       // 1. Run Automated AI Moderation
       const aiResult = await moderateMessageWithAI(cleanText, cleanAuthor);
 
-      // Determine initial status
+      // Calcul du score de bienveillance et conformité (0 à 100%)
+      const qualityScore = Math.max(0, 100 - (aiResult.toxicityScore ?? 0));
+
+      // Règle utilisateur : Si un message est détecté comme bon à 90% minimum (et verdict safe),
+      // le message se publie directement sur le mur sans besoin de validation manuelle de l'équipe.
+      const isNinetyPercentGood = (
+        qualityScore >= 90 &&
+        aiResult.verdict === "safe" &&
+        (!aiResult.flaggedCategories || aiResult.flaggedCategories.length === 0)
+      );
+
       let initialStatus: WallMessage["status"] = "pending";
-      if (wallConfig.autoApproveSafe && aiResult.verdict === "safe") {
+      if (isNinetyPercentGood || (wallConfig.autoApproveSafe && aiResult.verdict === "safe")) {
         initialStatus = "approved";
       }
 
@@ -438,6 +690,8 @@ async function startServer() {
         id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
         text: cleanText,
         author: cleanAuthor,
+        email: cleanEmail,
+        optInConsent: cleanOptIn,
         color: noteColor,
         fontFamily: cleanFontFamily,
         createdAt: Date.now(),
@@ -451,13 +705,31 @@ async function startServer() {
       messages.unshift(newMessage);
       saveMessages();
 
-      // Notify clients via SSE
+      // Enregistrement et synchronisation CRM du participant si email renseigné
+      let registeredParticipant: ParticipantRecord | undefined;
+      if (cleanEmail) {
+        registeredParticipant = registerOrUpdateParticipant({
+          email: cleanEmail,
+          author: cleanAuthor,
+          optInConsent: cleanOptIn,
+          memoryId: newMessage.id,
+          memoryText: cleanText,
+        });
+      }
+
+      // Notify clients via SSE for real-time update
       broadcastEvent("message_created", newMessage);
+      if (initialStatus === "approved") {
+        broadcastEvent("message_approved", { message: newMessage });
+      }
 
       res.status(201).json({
         success: true,
         message: newMessage,
+        publishedDirectly: initialStatus === "approved",
+        qualityScore,
         requiresHumanReview: initialStatus === "pending",
+        participant: registeredParticipant,
       });
     } catch (error) {
       console.error("Error creating message:", error);
@@ -566,11 +838,13 @@ async function startServer() {
   app.get("/api/admin/export", (req, res) => {
     const format = req.query.format as string;
     if (format === "csv") {
-      const headers = ["ID", "Date", "Auteur", "Message", "Statut", "Modération IA", "Score Toxicité"];
+      const headers = ["ID", "Date", "Auteur", "Email", "Opt-in Consentement", "Message", "Statut", "Modération IA", "Score Toxicité"];
       const rows = messages.map((m) => [
         `"${m.id}"`,
         `"${new Date(m.createdAt).toISOString()}"`,
         `"${m.author.replace(/"/g, '""')}"`,
+        `"${(m.email || '').replace(/"/g, '""')}"`,
+        `"${m.optInConsent ? 'Oui' : 'Non'}"`,
         `"${m.text.replace(/"/g, '""')}"`,
         `"${m.status}"`,
         `"${m.aiModeration.verdict}"`,
@@ -591,8 +865,10 @@ async function startServer() {
   app.post("/api/admin/reset-demo", (_req, res) => {
     messages = [...INITIAL_MESSAGES];
     saveMessages();
+    participants = buildParticipantsFromMessages(messages);
+    saveParticipants();
     broadcastEvent("wall_reset", { messages });
-    res.json({ success: true, count: messages.length });
+    res.json({ success: true, count: messages.length, participantsCount: participants.length });
   });
 
   // Stats
@@ -606,6 +882,220 @@ async function startServer() {
     };
     res.json(stats);
   });
+
+  // =========================================================================
+  // CRM & PARTICIPANTS ENDPOINTS (Stockage, Filtrage Opt-in, Exports & Sync)
+  // =========================================================================
+
+  // 1. Get Participants list & KPI statistics
+  app.get("/api/admin/participants", (req, res) => {
+    const filter = (req.query.filter as string) || "all";
+    const search = ((req.query.search as string) || "").trim().toLowerCase();
+
+    let filtered = [...participants];
+
+    if (filter === "opt_in") {
+      filtered = filtered.filter((p) => p.optInConsent === true);
+    } else if (filter === "opt_out") {
+      filtered = filtered.filter((p) => p.optInConsent === false);
+    }
+
+    if (search) {
+      filtered = filtered.filter(
+        (p) =>
+          p.email.toLowerCase().includes(search) ||
+          p.firstName.toLowerCase().includes(search) ||
+          p.latestMemoryText.toLowerCase().includes(search)
+      );
+    }
+
+    const totalParticipants = participants.length;
+    const totalOptIn = participants.filter((p) => p.optInConsent === true).length;
+    const totalOptOut = totalParticipants - totalOptIn;
+    const optInRate = totalParticipants > 0 ? Number(((totalOptIn / totalParticipants) * 100).toFixed(1)) : 0;
+    const latestParticipantAt = participants.length > 0 ? participants[0].lastSubmissionAt : undefined;
+
+    const stats: CrmStats = {
+      totalParticipants,
+      totalOptIn,
+      totalOptOut,
+      optInRate,
+      latestParticipantAt,
+    };
+
+    res.json({
+      participants: filtered,
+      stats,
+      totalCount: totalParticipants,
+      filteredCount: filtered.length,
+    });
+  });
+
+  // 2. Export Participants in universal CRM CSV format (Brevo, Mailchimp, HubSpot, Salesforce, Excel)
+  app.get("/api/admin/participants/export/csv", (req, res) => {
+    const filter = (req.query.filter as string) || "all";
+    let exportList = [...participants];
+
+    if (filter === "opt_in") {
+      exportList = exportList.filter((p) => p.optInConsent === true);
+    } else if (filter === "opt_out") {
+      exportList = exportList.filter((p) => p.optInConsent === false);
+    }
+
+    // Standard headers compatible with all CRMs
+    const headers = [
+      "Email",
+      "Prenom",
+      "Nom_Complet",
+      "Opt_In",
+      "Statut_Consentement_RGPD",
+      "Date_Inscription",
+      "Heure_Inscription",
+      "Nombre_Participations",
+      "Dernier_Souvenir",
+      "Origine_Campagne",
+    ];
+
+    const rows = exportList.map((p) => {
+      const dateObj = new Date(p.lastSubmissionAt);
+      const dateStr = dateObj.toLocaleDateString("fr-FR", { year: "numeric", month: "2-digit", day: "2-digit" });
+      const timeStr = dateObj.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+      return [
+        `"${p.email.replace(/"/g, '""')}"`,
+        `"${p.firstName.replace(/"/g, '""')}"`,
+        `"${p.fullName.replace(/"/g, '""')}"`,
+        `"${p.optInConsent ? "OUI" : "NON"}"`,
+        `"${p.optInConsent ? "CONSENTEMENT ACTIF" : "NON CONSENTI (Tirage au sort uniquement)"}"`,
+        `"${dateStr}"`,
+        `"${timeStr}"`,
+        p.totalSubmissions,
+        `"${(p.latestMemoryText || "").replace(/"/g, '""').replace(/\n/g, " ")}"`,
+        `"${(p.source || "Bleu Citron 40 ans").replace(/"/g, '""')}"`,
+      ];
+    });
+
+    // Add UTF-8 BOM (\uFEFF) so Excel opens accents cleanly without glitching
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+    const filenameFilter = filter === "opt_in" ? "opt-in" : filter === "opt_out" ? "non-opt-in" : "tous";
+    const dateStamp = new Date().toISOString().slice(0, 10);
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="participants_crm_bleu_citron_${filenameFilter}_${dateStamp}.csv"`);
+    res.send(csvContent);
+  });
+
+  // 3. Export Participants in JSON format (Direct API / Webhook connectors)
+  app.get("/api/admin/participants/export/json", (req, res) => {
+    const filter = (req.query.filter as string) || "all";
+    let exportList = [...participants];
+
+    if (filter === "opt_in") {
+      exportList = exportList.filter((p) => p.optInConsent === true);
+    } else if (filter === "opt_out") {
+      exportList = exportList.filter((p) => p.optInConsent === false);
+    }
+
+    const payload = {
+      campaign: "Bleu Citron Productions - 1 An de spectacles",
+      exportDate: new Date().toISOString(),
+      filterApplied: filter,
+      totalContacts: exportList.length,
+      contacts: exportList.map((p) => ({
+        email: p.email,
+        firstName: p.firstName,
+        fullName: p.fullName,
+        optInConsent: p.optInConsent,
+        rgpdStatus: p.rgpdStatus,
+        firstRegisteredAt: new Date(p.createdAt).toISOString(),
+        lastSubmissionAt: new Date(p.lastSubmissionAt).toISOString(),
+        participationsCount: p.totalSubmissions,
+        latestMemory: p.latestMemoryText,
+        source: p.source,
+      })),
+    };
+
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="participants_crm_bleu_citron_${Date.now()}.json"`);
+    res.json(payload);
+  });
+
+  // 4. Force Resync of Participants from all messages
+  app.post("/api/admin/participants/sync", (_req, res) => {
+    participants = buildParticipantsFromMessages(messages);
+    saveParticipants();
+    res.json({
+      success: true,
+      totalParticipants: participants.length,
+      totalOptIn: participants.filter((p) => p.optInConsent).length,
+    });
+  });
+
+  // 5. Delete a participant (Right to be forgotten / RGPD)
+  app.delete("/api/admin/participants/:id", (req, res) => {
+    const { id } = req.params;
+    const index = participants.findIndex((p) => p.id === id || p.email === id);
+    if (index === -1) {
+      res.status(404).json({ error: "Participant introuvable" });
+      return;
+    }
+    const removed = participants.splice(index, 1)[0];
+    saveParticipants();
+    broadcastEvent("participant_deleted", { id: removed.id, email: removed.email });
+    res.json({ success: true, removedEmail: removed.email });
+  });
+
+  // 6. Test external CRM webhook
+  app.post("/api/admin/crm/test-webhook", async (req, res) => {
+    try {
+      const { webhookUrl } = req.body;
+      if (!webhookUrl || typeof webhookUrl !== "string" || !webhookUrl.startsWith("http")) {
+        res.status(400).json({ error: "URL de webhook invalide (doit commencer par http:// ou https://)" });
+        return;
+      }
+
+      const testPayload = {
+        event: "test_ping",
+        source: "Bleu Citron Productions - Mur Collaboratif",
+        timestamp: new Date().toISOString(),
+        testParticipant: {
+          email: "test.crm@bleucitron.net",
+          firstName: "Participant Test",
+          optIn: true,
+          rgpdStatus: "OPT_IN",
+          memory: "Ceci est un test de synchronisation CRM depuis l'espace Régie Bleu Citron.",
+        },
+      };
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "BleuCitron-CRM-Tester/1.0",
+        },
+        body: JSON.stringify(testPayload),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      res.json({
+        success: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        error: err.message || "Erreur de connexion au Webhook",
+      });
+    }
+  });
+
+  // Serve static assets from public/ directly
+  app.use(express.static(path.join(process.cwd(), "public")));
 
   // Vite middleware setup (Express v4: use app.get('*', ...))
   if (process.env.NODE_ENV !== "production") {

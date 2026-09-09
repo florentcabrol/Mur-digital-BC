@@ -2,7 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import QRCode from 'qrcode';
 import { X, Printer, Copy, Check, ExternalLink, Smartphone } from 'lucide-react';
 import { WallConfig } from '../types';
+import { ScallopedBadge } from './ScallopedBadge';
+import { AnniversaryBadge } from './AnniversaryBadge';
 import { BleuCitronLogo } from './BleuCitronLogo';
+import { CampaignCarousel } from './CampaignCarousel';
 
 interface StreetPosterModalProps {
   isOpen: boolean;
@@ -25,12 +28,13 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
     const url = `${window.location.origin}/?mode=submit`;
     setSubmitUrl(url);
 
+    // Generate crisp QR code
     QRCode.toDataURL(url, {
-      width: 500,
-      margin: 2,
+      width: 600,
+      margin: 1,
       color: {
-        dark: '#050811',
-        light: '#ffffff',
+        dark: '#1F1D19',
+        light: '#efe8e8',
       },
       errorCorrectionLevel: 'H',
     })
@@ -53,18 +57,18 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/85 backdrop-blur-xl font-sans">
-      <div className="relative w-full max-w-xl bg-[#080d1e] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Modal Top Bar */}
-        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#080d1e] shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto bg-black/60 backdrop-blur-md font-sans">
+      <div className="relative w-full max-w-4xl bg-[#efe8e8] border border-[#1F1D19]/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[96vh]">
+        {/* Modal Top Control Bar */}
+        <div className="px-5 py-3.5 border-b border-[#1F1D19]/10 flex items-center justify-between bg-[#efe8e8] shrink-0 text-[#1F1D19]">
           <div className="flex items-center gap-3">
-            <BleuCitronLogo className="h-7 w-auto" light={true} />
+            <BleuCitronLogo className="h-6 w-auto" light={false} />
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                Affiche & QR Code Bleu Citron
+              <h2 className="text-xs sm:text-sm font-bold text-[#1F1D19] tracking-tight">
+                Affiche Officielle • Bleu Citron
               </h2>
-              <p className="text-xs text-slate-400">
-                Format d'impression officiel • bleucitron.net
+              <p className="text-[11px] text-slate-600">
+                Format d'impression & d'affichage en salle et dans la rue
               </p>
             </div>
           </div>
@@ -72,7 +76,7 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-slate-950 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#597abb] hover:bg-[#4a6ca7] text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
               title="Imprimer l'affiche"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -80,95 +84,81 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-1.5 rounded-xl text-slate-600 hover:text-[#1F1D19] hover:bg-black/5 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Poster Container */}
-        <div className="p-4 sm:p-8 overflow-y-auto bg-[#04060d] flex flex-col items-center justify-center">
-          {/* Architectural Poster Card */}
+        {/* Poster Viewer Container */}
+        <div className="p-3 sm:p-6 overflow-y-auto bg-[#efe8e8] flex flex-col items-center justify-center">
+          {/* THE OFFICIAL CAMPAIGN POSTER (1:1 with user image) */}
           <div
             ref={posterRef}
             id="printable-street-poster"
-            className="w-full max-w-md bg-[#070b18] text-white rounded-3xl p-7 sm:p-9 shadow-2xl border border-white/10 relative flex flex-col items-center text-center select-none overflow-hidden"
+            className="w-full max-w-3xl bg-[#efe8e8] text-[#1F1D19] rounded-2xl shadow-xl overflow-hidden border border-[#1F1D19]/15 select-none relative"
+            style={{
+              aspectRatio: '1.414 / 1', // ISO paper aspect ratio
+              minHeight: '480px',
+            }}
           >
-            {/* Top Brand Header with Official Logo */}
-            <div className="relative z-10 flex flex-col items-center gap-1.5 mb-5">
-              <BleuCitronLogo className="h-10 w-auto" light={true} />
-              <div className="flex items-center gap-2 text-[10px] text-yellow-400 font-semibold uppercase tracking-widest pt-1">
-                <span>Concerts</span>
-                <span>•</span>
-                <span>Spectacles</span>
-                <span>•</span>
-                <span>Festivals</span>
-              </div>
-            </div>
+            <div className="w-full h-full flex flex-col md:flex-row relative">
+              {/* ================= LEFT HALF ================= */}
+              <div className="w-full md:w-[48%] p-6 sm:p-8 flex flex-col justify-between items-center text-center relative z-10 bg-[#efe8e8]">
+                {/* 1. Presentation Headline */}
+                <div className="space-y-3 w-full">
+                  <h1 className="font-poster font-black text-2xl sm:text-3xl lg:text-[34px] leading-[1.08] text-[#1F1D19] tracking-tight uppercase">
+                    Raconte-nous ton plus<br />
+                    beau souvenir de concert<br />
+                    et tente de gagner
+                  </h1>
 
-            {/* Campaign Main Title */}
-            <div className="relative z-10 space-y-1.5 mb-6">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white uppercase font-display leading-tight">
-                Ton Meilleur Souvenir
-              </h1>
-              <p className="text-xs text-slate-300 max-w-xs mx-auto">
-                Partage en direct ton souvenir de concert ou de spectacle
-              </p>
-            </div>
-
-            {/* QR Code Container */}
-            <div className="relative z-10 bg-white p-4 rounded-3xl shadow-xl border-2 border-yellow-400 mb-6">
-              {qrDataUrl ? (
-                <img
-                  src={qrDataUrl}
-                  alt="QR Code Affiche"
-                  className="w-48 h-48 sm:w-52 sm:h-52 object-contain"
-                />
-              ) : (
-                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-slate-100 flex items-center justify-center">
-                  <span className="text-xs text-slate-400 animate-pulse">Génération...</span>
+                  {/* 2. Scalloped Blue Badge: 1 AN DE SPECTACLES BLEU CITRON */}
+                  <div className="flex justify-center pt-1">
+                    <ScallopedBadge size="md" className="scale-90 sm:scale-100 transform origin-center" />
+                  </div>
                 </div>
-              )}
-              <div className="mt-2 text-[10px] font-bold text-slate-900 flex items-center justify-center gap-1.5 tracking-wide uppercase">
-                <Smartphone className="w-3.5 h-3.5 text-slate-950" />
-                <span>Scanne avec ton téléphone</span>
-              </div>
-            </div>
 
-            {/* Instructions */}
-            <div className="relative z-10 w-full grid grid-cols-3 gap-2 text-center pt-2 pb-3 border-t border-white/10 text-[10px]">
-              <div className="p-2 rounded-xl bg-white/[0.03]">
-                <div className="font-bold text-yellow-400">1. SCANNE</div>
-                <div className="text-slate-400 text-[9px] mt-0.5">Le QR Code</div>
-              </div>
-              <div className="p-2 rounded-xl bg-white/[0.03]">
-                <div className="font-bold text-white">2. ÉCRIS</div>
-                <div className="text-slate-400 text-[9px] mt-0.5">Ton souvenir</div>
-              </div>
-              <div className="p-2 rounded-xl bg-white/[0.03]">
-                <div className="font-bold text-yellow-400">3. PARTAGE</div>
-                <div className="text-slate-400 text-[9px] mt-0.5">En direct</div>
-              </div>
-            </div>
+                {/* 3. QR Code with rounded soft container */}
+                <div className="my-2 p-3 sm:p-4 bg-white/80 rounded-2xl border border-[#1F1D19]/15 shadow-xs flex flex-col items-center">
+                  {qrDataUrl ? (
+                    <img
+                      src={qrDataUrl}
+                      alt="QR Code Souvenir Bleu Citron"
+                      className="w-40 h-40 sm:w-48 sm:h-48 object-contain"
+                    />
+                  ) : (
+                    <div className="w-40 h-40 bg-[#efe8e8] animate-pulse flex items-center justify-center">
+                      <span className="text-xs text-slate-500">QR Code...</span>
+                    </div>
+                  )}
+                </div>
 
-            {/* Footer */}
-            <div className="relative z-10 mt-4 text-[10px] text-slate-400">
-              <span>Bleu Citron • </span>
-              <span className="text-yellow-400 font-semibold">bleucitron.net</span>
+                {/* 4. Subtext: Tirage au sort le 30/09 */}
+                <div className="text-[11px] sm:text-xs font-bold text-[#1F1D19] leading-tight space-y-0.5">
+                  <p>Tirage au sort le 30/09</p>
+                  <p className="font-normal text-slate-700">le / la gagnant·e sera contacté·e par email</p>
+                </div>
+              </div>
+
+              {/* ================= RIGHT HALF: Campaign Carousel ================= */}
+              <div className="w-full md:w-[52%] relative overflow-hidden bg-[#efe8e8] flex flex-col justify-between border-t md:border-t-0 md:border-l border-[#1F1D19]/10">
+                <CampaignCarousel className="w-full h-full min-h-[460px]" intervalMs={4000} showBadge={true} />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="px-6 py-4 bg-[#080d1e] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+        {/* Modal Bottom Actions */}
+        <div className="px-6 py-3.5 bg-[#efe8e8] border-t border-[#1F1D19]/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-xs text-slate-600">
             <button
               onClick={handleCopyLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 text-xs border border-white/10 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 hover:bg-black/10 text-[#1F1D19] text-xs border border-[#1F1D19]/15 transition-colors cursor-pointer"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Lien copié' : 'Copier le lien'}</span>
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Lien copié' : 'Copier le lien direct'}</span>
             </button>
           </div>
 
@@ -177,14 +167,14 @@ export const StreetPosterModal: React.FC<StreetPosterModalProps> = ({
               href={submitUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 rounded-xl text-xs font-medium border border-white/10 transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-black/5 hover:bg-black/10 text-[#1F1D19] rounded-xl text-xs font-medium border border-[#1F1D19]/15 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Ouvrir la page mobile</span>
+              <span>Tester sur smartphone</span>
             </a>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-bold rounded-xl text-xs transition-transform hover:scale-[1.02] cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-[#597abb] hover:bg-[#4a6ca7] text-white font-bold rounded-xl text-xs transition-transform hover:scale-[1.02] cursor-pointer shadow-xs"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Imprimer l'affiche</span>

@@ -6,10 +6,22 @@ body {
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  background-color: #efe8e8;
+  color: #1F1D19;
+}
+
+#root {
+  background-color: #efe8e8;
+  min-height: 100vh;
 }
 
 .font-display {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Barlow Condensed', 'Outfit', 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-poster {
+  font-family: 'Barlow Condensed', 'Anton', 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .font-handwriting {

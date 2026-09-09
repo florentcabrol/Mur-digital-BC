@@ -1,0 +1,18 @@
+[
+  {
+    "id": "part_camille_test_fr",
+    "email": "camille@test.fr",
+    "firstName": "Camille",
+    "fullName": "Camille",
+    "optInConsent": true,
+    "rgpdStatus": "opt_in",
+    "createdAt": 1788879976260,
+    "lastSubmissionAt": 1788879976260,
+    "totalSubmissions": 1,
+    "latestMemoryText": "Un concert mémorable au Zénith de Toulouse, des frissons du début à la fin !",
+    "allMemoryIds": [
+      "msg_1788879976260_8himj"
+    ],
+    "source": "Mur 40 ans - Concours 1 an de spectacles"
+  }
+]

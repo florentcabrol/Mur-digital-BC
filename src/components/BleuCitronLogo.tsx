@@ -13,10 +13,8 @@ export const BleuCitronLogo: React.FC<BleuCitronLogoProps> = ({
   light = true,
   withTagline = false,
 }) => {
-  // Letters color: on dark backgrounds (light=true) BLEU & CRON are white, 'I' is bright citron yellow (#F5EE38).
-  // On light backgrounds (light=false), BLEU & CRON are deep navy (#0e1a38 / #1e87f0), 'I' is yellow-amber (#eab308).
+  // The entire logo is unified in black/mainColor as requested (no yellow 'I')
   const mainColor = light ? '#FFFFFF' : '#0B132B';
-  const accentColor = '#F5EE38'; // Citron signature
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
@@ -42,8 +40,8 @@ export const BleuCitronLogo: React.FC<BleuCitronLogoProps> = ({
           <path d="M312.2,86.8h21.5l22.6,38.9h0.6V86.8h18.5v70H354L331.3,118h-0.6v38.9h-18.5V86.8z"/>
         </g>
 
-        {/* CITRON: Iconic Tilted 'I' with Round Dot (The signature highlight) */}
-        <g fill={variant === 'monochrome' ? 'currentColor' : accentColor}>
+        {/* CITRON: Tilted 'I' with Round Dot in black like the rest of the logo */}
+        <g fill={variant === 'monochrome' ? 'currentColor' : mainColor}>
           <polygon points="89.9,156.9 108.9,156.9 102.2,102.6 83.5,104.9"/>
           <path d="M92.2,99.5c6.2-0.8,10.1-4.8,9.4-10.8c-0.7-6-5.5-9-11.7-8.2c-6.2,0.8-10.1,4.9-9.4,10.8C81.3,97.3,86.1,100.2,92.2,99.5z"/>
         </g>
@@ -54,7 +52,7 @@ export const BleuCitronLogo: React.FC<BleuCitronLogoProps> = ({
           <span className={`text-[10px] font-black uppercase tracking-widest ${light ? 'text-white' : 'text-slate-900'}`}>
             PRODUCTIONS
           </span>
-          <span className="text-[9px] text-yellow-400 font-medium tracking-wide">
+          <span className="text-[9px] text-[#597abb] font-semibold tracking-wide">
             Spectacles & Festivals
           </span>
         </div>

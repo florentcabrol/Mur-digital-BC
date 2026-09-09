@@ -4,93 +4,101 @@ import {
   Maximize2,
   Minimize2,
   Shield,
-  Palette,
   Smartphone,
   ExternalLink,
   Ticket,
+  Calendar,
 } from 'lucide-react';
-import { WallConfig, WallTheme } from '../types';
+import { WallConfig } from '../types';
 import { BleuCitronLogo } from './BleuCitronLogo';
+import { ScallopedBadge } from './ScallopedBadge';
 
 interface WallHeaderProps {
   config: WallConfig;
   pendingCount: number;
+  showRegieButton?: boolean;
   onOpenStreetPoster: () => void;
   onOpenAdmin: () => void;
-  onChangeTheme: (theme: WallTheme) => void;
   onSwitchToSubmit: () => void;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  onTriggerSecretUnlock?: () => void;
 }
 
 export const WallHeader: React.FC<WallHeaderProps> = ({
   config,
   pendingCount,
+  showRegieButton = false,
   onOpenStreetPoster,
   onOpenAdmin,
-  onChangeTheme,
   onSwitchToSubmit,
   isFullscreen,
   onToggleFullscreen,
+  onTriggerSecretUnlock,
 }) => {
-  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
 
-  const themes: { id: WallTheme; label: string; desc: string }[] = [
-    { id: 'bleu-nuit', label: 'Bleu Nuit Citron', desc: 'Fond profond & auras lumineuses' },
-    { id: 'bleu-citron', label: 'Signature Électrique', desc: 'Bleu azur & accents citron' },
-    { id: 'minimal-white', label: 'Galerie Épurée', desc: 'Design épuré fond blanc bleucitron.net' },
-    { id: 'projection', label: 'Projection Scène', desc: 'Optimisé écrans géants & nuit' },
-    { id: 'corkboard', label: 'Post-it Contemporain', desc: 'Ambiance chaleureuse' },
-  ];
-
-  const isDarkTheme =
-    config.theme === 'bleu-nuit' ||
-    config.theme === 'bleu-citron' ||
-    config.theme === 'projection' ||
-    config.theme === 'neon' ||
-    config.theme === 'chalkboard';
+  const handleLogoClick = () => {
+    // Secret team trigger: 3 fast clicks on the logo opens team access prompt
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+    if (newCount >= 3) {
+      setLogoClickCount(0);
+      if (onTriggerSecretUnlock) {
+        onTriggerSecretUnlock();
+      }
+    }
+    setTimeout(() => setLogoClickCount(0), 2000);
+  };
 
   return (
-    <header className="relative z-30 px-4 sm:px-8 py-4 transition-colors border-b border-white/[0.06] bg-[#050811]/90 backdrop-blur-xl">
+    <header className="relative z-30 px-4 sm:px-8 py-3.5 transition-colors border-b border-[#1F1D19]/10 bg-[#efe8e8]/95 backdrop-blur-xl text-[#1F1D19]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Left: Brand Identity with Official Logo from bleucitron.net */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+        {/* Left: Official Logo + Presentation Headline + Scalloped Badge */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left">
           {/* Official Bleu Citron Logo */}
-          <a
-            href="https://www.bleucitron.net/"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Visiter bleucitron.net"
-            className="hover:opacity-90 transition-opacity flex items-center"
+          <div
+            onClick={handleLogoClick}
+            className="cursor-pointer select-none shrink-0 transform hover:scale-105 transition-transform"
+            title="Bleu Citron Productions"
           >
-            <BleuCitronLogo className="h-9 w-auto" light={isDarkTheme} withTagline={true} />
-          </a>
+            <BleuCitronLogo className="h-8 sm:h-9 w-auto" light={false} withTagline={false} />
+          </div>
 
-          <div className="space-y-0.5">
+          <div className="flex flex-col items-center sm:items-start gap-1">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#597abb]/15 border border-[#597abb]/30 text-[#597abb]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#597abb] animate-pulse" />
                 <span>Souvenirs en direct</span>
               </span>
-              <span className="text-[10px] text-slate-400 hidden sm:inline">• 40 ans de concerts & spectacles</span>
+              <span className="text-[10px] font-medium text-slate-600 hidden sm:flex items-center gap-1">
+                <Calendar className="w-3 h-3 text-[#f49e48]" />
+                Tirage au sort le 30/09
+              </span>
             </div>
 
-            <p className="text-xs sm:text-sm font-medium text-slate-300 leading-snug">
-              {config.subtitle || 'Partage ton meilleur souvenir de concert / spectacle avec Bleu Citron'}
-            </p>
+            {/* Presentation phrase + Scalloped Badge */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-0.5">
+              <h1 className="font-poster font-bold text-sm sm:text-base text-[#1F1D19] tracking-tight">
+                Raconte-nous ton plus beau souvenir de concert et tente de gagner
+              </h1>
+              <div className="shrink-0 scale-75 origin-left hidden lg:block">
+                <ScallopedBadge size="sm" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right: Controls & Action Triggers aligned with bleucitron.net */}
+        {/* Right: Controls & Action Triggers matching brand colors */}
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {/* Main QR Code & Poster Trigger (Yellow CTA as on Bleu Citron marketing) */}
+          {/* Main QR Code & Poster Trigger */}
           <button
             id="header-street-poster-btn"
             onClick={onOpenStreetPoster}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-bold rounded-2xl shadow-lg hover:shadow-yellow-400/20 transition-all text-xs sm:text-sm cursor-pointer transform hover:scale-[1.02]"
+            className="flex items-center gap-2 px-4 py-2 bg-[#597abb] hover:bg-[#4a6ca7] text-white font-bold rounded-2xl shadow-md hover:shadow-lg transition-all text-xs sm:text-sm cursor-pointer transform hover:scale-[1.02]"
             title="Afficher l'affiche officielle avec QR Code"
           >
-            <QrIcon className="w-4 h-4 text-slate-950" />
+            <QrIcon className="w-4 h-4 text-white" />
             <span>Affiche & QR Code</span>
           </button>
 
@@ -98,99 +106,59 @@ export const WallHeader: React.FC<WallHeaderProps> = ({
           <button
             id="header-mobile-submit-btn"
             onClick={onSwitchToSubmit}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-semibold backdrop-blur border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 transition-all cursor-pointer"
-            title="Tester la page mobile du QR code"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-semibold border border-[#1F1D19]/15 bg-[#efe8e8] hover:bg-[#efe8e8]/80 text-[#1F1D19] transition-all cursor-pointer shadow-xs"
+            title="Partager un souvenir"
           >
-            <Smartphone className="w-3.5 h-3.5 text-yellow-400" />
+            <Smartphone className="w-3.5 h-3.5 text-[#f49e48]" />
             <span className="hidden sm:inline">Écrire un souvenir</span>
           </button>
 
-          {/* Link to Official Billetterie spectacles.bleucitron.net */}
+          {/* Link to Official Billetterie spectacles.bleucitron.net (Nommé Billetterie -40%) */}
           <a
             href="https://spectacles.bleucitron.net/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-slate-300 hover:text-white transition-colors"
-            title="Accéder à la billetterie officielle Bleu Citron"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-semibold border border-[#1F1D19]/15 bg-[#efe8e8] hover:bg-[#efe8e8]/80 text-[#1F1D19] transition-colors shadow-xs"
+            title="Accéder à la billetterie officielle Bleu Citron (-40%)"
           >
-            <Ticket className="w-3.5 h-3.5 text-sky-400" />
-            <span>Billetterie</span>
+            <Ticket className="w-3.5 h-3.5 text-[#597abb]" />
+            <span className="font-bold text-[#597abb]">Billetterie -40%</span>
             <ExternalLink className="w-2.5 h-2.5 opacity-60" />
           </a>
-
-          {/* Theme Switcher Dropdown */}
-          <div className="relative">
-            <button
-              id="theme-picker-toggle-btn"
-              onClick={() => setShowThemePicker(!showThemePicker)}
-              className="p-2.5 rounded-2xl text-xs font-semibold backdrop-blur border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 transition-all cursor-pointer"
-              title="Changer d'ambiance visuelle"
-            >
-              <Palette className="w-4 h-4 text-slate-300" />
-            </button>
-
-            {showThemePicker && (
-              <div className="absolute right-0 mt-2 w-56 bg-[#080d1e] backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-2xl z-50 text-xs animate-fade-in">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2 py-1 mb-1">
-                  Ambiance du Mur
-                </div>
-                {themes.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      onChangeTheme(t.id);
-                      setShowThemePicker(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 rounded-xl transition-colors flex flex-col gap-0.5 ${
-                      config.theme === t.id
-                        ? 'bg-yellow-400 text-slate-950 font-bold'
-                        : 'text-slate-300 hover:bg-white/[0.05]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">{t.label}</span>
-                      {config.theme === t.id && <span className="text-xs font-black">✓</span>}
-                    </div>
-                    <span className={`text-[10px] ${config.theme === t.id ? 'text-slate-900' : 'text-slate-500'}`}>
-                      {t.desc}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Fullscreen Projection toggle */}
           <button
             id="fullscreen-toggle-btn"
             onClick={onToggleFullscreen}
-            className="p-2.5 rounded-2xl text-xs font-semibold backdrop-blur border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 transition-all cursor-pointer"
+            className="p-2.5 rounded-2xl text-xs font-semibold border border-[#1F1D19]/15 bg-[#efe8e8] hover:bg-[#efe8e8]/80 text-[#1F1D19] transition-all cursor-pointer shadow-xs"
             title={isFullscreen ? 'Quitter le plein écran' : 'Mode projection scène / plein écran'}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
 
-          {/* Régie & Modération Admin Button */}
-          <button
-            id="header-admin-btn"
-            onClick={onOpenAdmin}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-semibold backdrop-blur border transition-all cursor-pointer relative ${
-              pendingCount > 0
-                ? 'bg-yellow-400 hover:bg-yellow-300 text-slate-950 border-yellow-300 shadow-lg animate-pulse'
-                : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 border-white/10'
-            }`}
-            title="Accéder à la régie de modération"
-          >
-            <Shield className="w-3.5 h-3.5 text-slate-300" />
-            <span>Régie</span>
-            {pendingCount > 0 ? (
-              <span className="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {pendingCount}
-              </span>
-            ) : (
-              <span className="text-[10px] opacity-60 hidden sm:inline">Florent</span>
-            )}
-          </button>
+          {/* Régie & Modération Admin Button - EXCLUSIVEMENT VISIBLE pour l'équipe autorisée */}
+          {showRegieButton && (
+            <button
+              id="header-admin-btn"
+              onClick={onOpenAdmin}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-semibold border transition-all cursor-pointer relative ${
+                pendingCount > 0
+                  ? 'bg-[#f49e48] hover:bg-[#EE8824] text-slate-950 border-[#f49e48] shadow-lg animate-pulse'
+                  : 'bg-[#1F1D19] hover:bg-[#2F2B22] text-white border-[#1F1D19]'
+              }`}
+              title="Espace Régie (Équipe Bleu Citron)"
+            >
+              <Shield className="w-3.5 h-3.5 text-yellow-300" />
+              <span>Régie</span>
+              {pendingCount > 0 ? (
+                <span className="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {pendingCount}
+                </span>
+              ) : (
+                <span className="text-[10px] opacity-75 hidden sm:inline">Équipe</span>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>

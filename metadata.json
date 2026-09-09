@@ -1,6 +1,6 @@
 {
   "name": "Bleu Citron",
-  "description": "Partage ton meilleur souvenir de concert ou spectacle avec Bleu Citron.",
+  "description": "Raconte-nous ton plus beau souvenir de concert et tente de gagner 1 an de spectacles Bleu Citron.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

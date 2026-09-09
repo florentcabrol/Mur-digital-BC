@@ -15,6 +15,8 @@ export interface WallMessage {
   id: string;
   text: string;
   author: string;
+  email?: string;
+  optInConsent?: boolean;
   color: NoteColor;
   fontFamily?: string; // 'outfit' | 'caveat' | 'playfair' | 'syne' | 'dancing' | 'space-mono'
   createdAt: number;
@@ -46,6 +48,8 @@ export interface WallConfig {
   autoApproveSafe: boolean; // if true, AI 'safe' messages don't need manual approval, default false
   campaignCity?: string;
   brandName?: string;
+  crmWebhookUrl?: string; // Optional external webhook for CRM sync (Brevo, HubSpot, Zapier, etc.)
+  crmAutoSync?: boolean; // If true, auto-sends each new submission to the webhook
 }
 
 export interface ModerationStats {
@@ -54,4 +58,28 @@ export interface ModerationStats {
   approved: number;
   rejected: number;
   archived: number;
+}
+
+export interface ParticipantRecord {
+  id: string;
+  email: string;
+  firstName: string;
+  fullName: string;
+  optInConsent: boolean;
+  rgpdStatus: 'opt_in' | 'opt_out';
+  createdAt: number;
+  lastSubmissionAt: number;
+  totalSubmissions: number;
+  latestMemoryText: string;
+  allMemoryIds: string[];
+  source: string;
+  crmExportedAt?: number;
+}
+
+export interface CrmStats {
+  totalParticipants: number;
+  totalOptIn: number;
+  totalOptOut: number;
+  optInRate: number; // percentage (e.g. 78.5)
+  latestParticipantAt?: number;
 }

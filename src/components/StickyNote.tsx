@@ -10,119 +10,69 @@ interface StickyNoteProps {
   theme?: WallTheme;
 }
 
-const COLOR_STYLES_DARK: Record<NoteColor, {
+const COLOR_STYLES: Record<NoteColor, {
   bg: string;
   border: string;
   text: string;
   accentBar: string;
   dot: string;
+  tagBg: string;
 }> = {
   yellow: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-yellow-400/25 hover:border-yellow-400/60',
-    text: 'text-white',
-    accentBar: 'bg-yellow-400',
-    dot: 'bg-yellow-400',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-[#f49e48]/35 hover:border-[#f49e48]',
+    text: 'text-[#1F1D19]',
+    accentBar: 'bg-[#f49e48]',
+    dot: 'bg-[#f49e48]',
+    tagBg: 'text-[#f49e48] bg-[#f49e48]/10',
   },
   pink: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-pink-400/25 hover:border-pink-400/60',
-    text: 'text-white',
-    accentBar: 'bg-pink-400',
-    dot: 'bg-pink-400',
-  },
-  blue: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-blue-400/25 hover:border-blue-400/60',
-    text: 'text-white',
-    accentBar: 'bg-blue-400',
-    dot: 'bg-blue-400',
-  },
-  green: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-emerald-400/25 hover:border-emerald-400/60',
-    text: 'text-white',
-    accentBar: 'bg-emerald-400',
-    dot: 'bg-emerald-400',
-  },
-  purple: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-purple-400/25 hover:border-purple-400/60',
-    text: 'text-white',
-    accentBar: 'bg-purple-400',
-    dot: 'bg-purple-400',
-  },
-  orange: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-orange-400/25 hover:border-orange-400/60',
-    text: 'text-white',
-    accentBar: 'bg-orange-400',
-    dot: 'bg-orange-400',
-  },
-  white: {
-    bg: 'bg-[#090e1f]/90 backdrop-blur-xl',
-    border: 'border-white/15 hover:border-white/40',
-    text: 'text-white',
-    accentBar: 'bg-white',
-    dot: 'bg-white',
-  },
-};
-
-const COLOR_STYLES_LIGHT: Record<NoteColor, {
-  bg: string;
-  border: string;
-  text: string;
-  accentBar: string;
-  dot: string;
-}> = {
-  yellow: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-amber-200 hover:border-amber-400',
-    text: 'text-slate-900',
-    accentBar: 'bg-amber-400',
-    dot: 'bg-amber-500',
-  },
-  pink: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-pink-200 hover:border-pink-400',
-    text: 'text-slate-900',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-pink-300 hover:border-pink-500',
+    text: 'text-[#1F1D19]',
     accentBar: 'bg-pink-400',
     dot: 'bg-pink-500',
+    tagBg: 'text-pink-600 bg-pink-50',
   },
   blue: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-sky-200 hover:border-sky-400',
-    text: 'text-slate-900',
-    accentBar: 'bg-blue-500',
-    dot: 'bg-blue-500',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-[#597abb]/35 hover:border-[#597abb]',
+    text: 'text-[#1F1D19]',
+    accentBar: 'bg-[#597abb]',
+    dot: 'bg-[#597abb]',
+    tagBg: 'text-[#597abb] bg-[#597abb]/10',
   },
   green: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-emerald-200 hover:border-emerald-400',
-    text: 'text-slate-900',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-emerald-300 hover:border-emerald-500',
+    text: 'text-[#1F1D19]',
     accentBar: 'bg-emerald-400',
     dot: 'bg-emerald-500',
+    tagBg: 'text-emerald-700 bg-emerald-50',
   },
   purple: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-purple-200 hover:border-purple-400',
-    text: 'text-slate-900',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-purple-300 hover:border-purple-500',
+    text: 'text-[#1F1D19]',
     accentBar: 'bg-purple-400',
     dot: 'bg-purple-500',
+    tagBg: 'text-purple-700 bg-purple-50',
   },
   orange: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-orange-200 hover:border-orange-400',
-    text: 'text-slate-900',
-    accentBar: 'bg-orange-400',
-    dot: 'bg-orange-500',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-[#f49e48]/45 hover:border-[#f49e48]',
+    text: 'text-[#1F1D19]',
+    accentBar: 'bg-[#f49e48]',
+    dot: 'bg-[#f49e48]',
+    tagBg: 'text-[#f49e48] bg-[#f49e48]/10',
   },
   white: {
-    bg: 'bg-white/95 backdrop-blur-md',
-    border: 'border-slate-200 hover:border-slate-400',
-    text: 'text-slate-900',
-    accentBar: 'bg-slate-400',
-    dot: 'bg-slate-500',
+    bg: 'bg-[#efe8e8]',
+    border: 'border-[#1F1D19]/15 hover:border-[#1F1D19]/40',
+    text: 'text-[#1F1D19]',
+    accentBar: 'bg-[#597abb]',
+    dot: 'bg-[#597abb]',
+    tagBg: 'text-[#597abb] bg-[#597abb]/10',
   },
 };
 
@@ -135,10 +85,8 @@ const FONT_CLASSES: Record<string, string> = {
   'space-mono': 'font-space-mono text-sm sm:text-base',
 };
 
-export const StickyNote: React.FC<StickyNoteProps> = ({ message, onSelect, showAdminBadge, theme = 'bleu-nuit' }) => {
-  const isDark = theme === 'bleu-nuit' || theme === 'bleu-citron' || theme === 'projection' || theme === 'neon' || theme === 'chalkboard';
-  const styleMap = isDark ? COLOR_STYLES_DARK : COLOR_STYLES_LIGHT;
-  const style = styleMap[message.color] || styleMap.yellow;
+export const StickyNote: React.FC<StickyNoteProps> = ({ message, onSelect, showAdminBadge, theme = 'bleu-citron' }) => {
+  const style = COLOR_STYLES[message.color] || COLOR_STYLES.yellow;
 
   const formatTime = (timestamp: number) => {
     const diffSec = Math.floor((Date.now() - timestamp) / 1000);
@@ -161,55 +109,53 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ message, onSelect, showA
       transition={{ type: 'spring', stiffness: 400, damping: 28 }}
       style={{ rotate: isCorkboard ? `${message.rotation}deg` : '0deg' }}
       onClick={() => onSelect?.(message)}
-      className={`relative p-6 rounded-3xl border ${style.bg} ${style.border} ${style.text} shadow-xl hover:shadow-2xl cursor-pointer transition-all select-none group flex flex-col justify-between min-h-[190px] overflow-hidden`}
+      className={`relative p-6 rounded-3xl border ${style.bg} ${style.border} ${style.text} shadow-lg hover:shadow-xl cursor-pointer transition-all select-none group flex flex-col justify-between min-h-[190px] overflow-hidden`}
     >
-      {/* Subtle top edge accent thread */}
-      <div className={`absolute top-0 left-0 right-0 h-[2px] ${style.accentBar} opacity-60 group-hover:opacity-100 transition-opacity`} />
+      {/* Top edge accent line */}
+      <div className={`absolute top-0 left-0 right-0 h-[3px] ${style.accentBar} opacity-80 group-hover:opacity-100 transition-opacity`} />
 
       {/* Top Header: Clean metadata */}
-      <div className="flex items-center justify-between gap-2 mb-4 pb-2 border-b border-white/[0.05]">
+      <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-[#1F1D19]/10">
         <div className="flex items-center gap-2">
-          <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-          <span className="text-[10px] font-semibold tracking-widest uppercase text-slate-400">
+          <span className={`w-2 h-2 rounded-full ${style.dot}`} />
+          <span className="text-[10px] font-black tracking-widest uppercase text-slate-600 font-display">
             Bleu Citron
           </span>
           {message.pinned && (
             <span title="Épinglé" className="ml-1">
-              <Pin className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400/30" />
+              <Pin className="w-3.5 h-3.5 text-[#F59432] fill-[#F59432]/30" />
             </span>
           )}
         </div>
 
         {/* Timestamp */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-400">
+        <div className="flex items-center gap-1.5 text-xs text-slate-500">
           <Clock className="w-3 h-3 opacity-60" />
           <span className="text-[10px] font-medium">{formatTime(message.createdAt)}</span>
         </div>
       </div>
 
-      {/* Message Body with custom typography */}
+      {/* Message Body with typography */}
       <div className="py-2 flex-1 flex items-center">
-        <p className={`text-base sm:text-lg font-medium tracking-tight leading-relaxed break-words whitespace-pre-wrap ${fontClass} ${
-          isDark ? 'text-white' : 'text-slate-900'
-        }`}>
+        <p className={`text-base sm:text-lg font-medium tracking-tight leading-relaxed break-words whitespace-pre-wrap ${fontClass} text-[#1F1D19]`}>
           "{message.text}"
         </p>
       </div>
 
       {/* Footer / Signature */}
-      <div className={`pt-4 border-t ${isDark ? 'border-white/[0.06]' : 'border-slate-200'} flex items-center justify-between text-xs mt-3`}>
-        <span className={`font-semibold tracking-tight text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+      <div className="pt-3 border-t border-[#1F1D19]/10 flex items-center justify-between text-xs mt-3">
+        <span className="font-bold tracking-tight text-xs text-slate-800">
           — {message.author || 'Anonyme'}
         </span>
-        <span className="text-[9px] tracking-widest font-black uppercase text-yellow-400/90 font-display">
+        <span className={`text-[9px] tracking-widest font-black uppercase px-2 py-0.5 rounded-md ${style.tagBg} font-display`}>
           SOUVENIR
         </span>
       </div>
 
       {/* Optional Admin AI Moderation Indicator */}
       {showAdminBadge && (
-        <div className="mt-3 pt-2 flex items-center justify-between text-[10px] border-t border-white/5 text-slate-400">
-          <span className="flex items-center gap-1 text-emerald-400 font-semibold">
+        <div className="mt-3 pt-2 flex items-center justify-between text-[10px] border-t border-[#1F1D19]/10 text-slate-500">
+          <span className="flex items-center gap-1 text-emerald-600 font-semibold">
             <ShieldCheck className="w-3 h-3" />
             <span>IA: {message.aiModeration.verdict}</span>
           </span>

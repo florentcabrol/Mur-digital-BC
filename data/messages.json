@@ -1,0 +1,102 @@
+[
+  {
+    "id": "msg_1788957355389_ojcdp",
+    "text": "Souvenir test sans opt-in pour vérifier la segmentation",
+    "author": "Julien",
+    "email": "julien.dupont@test.fr",
+    "optInConsent": false,
+    "color": "yellow",
+    "fontFamily": "outfit",
+    "createdAt": 1788957355389,
+    "status": "approved",
+    "pinned": false,
+    "rotation": 0.5,
+    "aiModeration": {
+      "verdict": "safe",
+      "summary": "Analyse automatique : message bienveillant et conforme.",
+      "toxicityScore": 5,
+      "flaggedCategories": [],
+      "suggestedAction": "approve",
+      "analyzedAt": 1788957355389
+    },
+    "moderatedAt": 1788957355389
+  },
+  {
+    "id": "msg_1788879976260_8himj",
+    "text": "Un concert mémorable au Zénith de Toulouse, des frissons du début à la fin !",
+    "author": "Camille",
+    "email": "camille@test.fr",
+    "optInConsent": true,
+    "color": "yellow",
+    "fontFamily": "outfit",
+    "createdAt": 1788879976260,
+    "status": "pending",
+    "pinned": false,
+    "rotation": 0.3,
+    "aiModeration": {
+      "verdict": "safe",
+      "summary": "Analyse automatique : message bienveillant et conforme.",
+      "toxicityScore": 5,
+      "flaggedCategories": [],
+      "suggestedAction": "approve",
+      "analyzedAt": 1788879976260
+    }
+  },
+  {
+    "id": "msg_init_1",
+    "text": "Le concert de Bigflo & Oli au Stadium... Une communion totale avec 30 000 personnes et une émotion inoubliable du début à la fin !",
+    "author": "Sophie M.",
+    "color": "yellow",
+    "createdAt": 1788876372794,
+    "status": "approved",
+    "pinned": true,
+    "rotation": -1.2,
+    "aiModeration": {
+      "verdict": "safe",
+      "summary": "Magnifique souvenir de concert avec Bleu Citron.",
+      "toxicityScore": 0,
+      "flaggedCategories": [],
+      "suggestedAction": "approve",
+      "analyzedAt": 1788876372794
+    },
+    "moderatedAt": 1788876472794
+  },
+  {
+    "id": "msg_init_2",
+    "text": "Le spectacle d'Alex Lutz au Casino Barrière, des rires aux larmes pendant deux heures. La magie du spectacle vivant signée Bleu Citron.",
+    "author": "Camille & Thomas",
+    "color": "blue",
+    "createdAt": 1788878172794,
+    "status": "approved",
+    "pinned": false,
+    "rotation": 1.5,
+    "aiModeration": {
+      "verdict": "safe",
+      "summary": "Témoignage enthousiaste sur un spectacle d'humour.",
+      "toxicityScore": 0,
+      "flaggedCategories": [],
+      "suggestedAction": "approve",
+      "analyzedAt": 1788878172794
+    },
+    "moderatedAt": 1788878222794
+  },
+  {
+    "id": "msg_init_3",
+    "text": "Grand Corps Malade au Zénith : les frissons sur chaque texte. Un souvenir gravé à jamais dans ma mémoire !",
+    "author": "Julien",
+    "color": "green",
+    "createdAt": 1788879072794,
+    "status": "approved",
+    "pinned": false,
+    "rotation": -2.1,
+    "aiModeration": {
+      "verdict": "safe",
+      "summary": "Souvenir poétique et chaleureux de concert.",
+      "toxicityScore": 0,
+      "flaggedCategories": [],
+      "suggestedAction": "approve",
+      "analyzedAt": 1788879072794
+    },
+    "moderatedAt": 1788879122794
+  }
+]
